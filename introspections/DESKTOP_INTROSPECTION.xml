@@ -1,0 +1,11 @@
+<node>
+  <interface name="org.freedesktop.DBus.Introspectable">
+    <method name="Introspect">
+      <arg name="data" type="s" direction="out" />
+    </method>
+  </interface>
+  <node name="Appearance" />
+  <node name="Desktop" />
+  <node name="Keyboard" />
+  <node name="Display" />
+</node>

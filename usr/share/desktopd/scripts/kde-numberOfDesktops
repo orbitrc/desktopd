@@ -1,0 +1,13 @@
+#!/bin/sh
+
+OUTPUT=`dbus-send --session --dest=org.kde.KWin \
+    --print-reply /VirtualDesktopManager \
+    org.freedesktop.DBus.Properties.Get \
+    string:org.kde.KWin.VirtualDesktopManager \
+    string:count |grep variant`
+
+if [ $? -ne 0 ]; then
+    return 1
+fi
+
+echo $OUTPUT |sed -E 's/[ ]*variant[ ]+uint32[ ]+([0-9]+)/\1/'

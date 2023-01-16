@@ -1,0 +1,22 @@
+#!/bin/sh
+
+INDEX=$1
+
+if [ -z "$INDEX" ]; then
+    exit 1
+fi
+
+if [ $INDEX -lt 0 ]; then
+    exit 1
+fi
+
+OUTPUT=`dbus-send --session --dest=org.kde.KWin \
+    --print-reply \
+    --type=method_call \
+    /VirtualDesktopManager \
+    org.kde.KWin.VirtualDesktopManager.createDesktop \
+    uint32:$INDEX string:"Desktop"`
+
+if [ $? -ne 0 ]; then
+    exit 1
+fi

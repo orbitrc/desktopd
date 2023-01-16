@@ -1,0 +1,12 @@
+[Unit]
+Desciption=Cross-DE user desktop configuration daemon
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+ExecStart=/usr/bin/desktopd
+
+[Install]
+WantedBy=default.target
+
