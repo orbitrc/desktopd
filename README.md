@@ -24,7 +24,7 @@ desktopd runs DE-specific scripts for those actions.
 
 For example, when the user executes the
 `io.orbitrc.Desktop.Desktop.insertDesktop` method, the
-`/usr/share/desktopd/scripts-enabled/insertDesktop` script is executed.
+`~/.local/share/desktopd/scripts-enabled/insertDesktop` script is executed.
 It is a symbolic link to the
 `/usr/share/desktopd/scripts/kde-insertDesktop` script if you are using
 KDE Plasma desktop environment.

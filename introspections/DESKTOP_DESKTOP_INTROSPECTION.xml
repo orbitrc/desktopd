@@ -1,18 +1,19 @@
 <node>
   <interface name="io.orbitrc.Desktop.Desktop">
     <signal name="numberOfDesktopsChanged" />
-    <property name="numberOfDesktops" access="read" type="i" />
+    <signal name="currentDesktopChanged" />
+
     <method name="insertDesktop">
       <arg name="value" direction="in" type="i" />
     </method>
     <method name="removeDesktop">
       <arg name="value" direction="in" type="i" />
     </method>
-
-    <signal name="currentDesktopChanged" />
-    <property name="currentDesktop" access="read" type="i" />
     <method name="setCurrentDesktop">
       <arg name="value" direction="in" type="i" />
     </method>
+
+    <property name="numberOfDesktops" access="read" type="i" />
+    <property name="currentDesktop" access="read" type="i" />
   </interface>
 </node>

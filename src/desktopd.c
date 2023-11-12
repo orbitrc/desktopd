@@ -6,6 +6,7 @@
 
 #include "introspections.h"
 #include "interfaces.h"
+#include "desktopd-server.h"
 
 const char *const SERVER_BUS_NAME = "io.orbitrc.Desktop";
 
@@ -40,9 +41,66 @@ const char *const DESKTOP_KEYBOARD_INTROSPECTION =
     "  </interface>\n"
     "</node>";
 
+const char *DESKTOP_INTERFACE = "io.orbitrc.Desktop.Desktop";
+const char *APPEARANCE_INTERFACE = "io.orbitrc.Desktop.Appearance";
+
 void print_version()
 {
     printf("desktopd version 0.1.0\n");
+}
+
+static void introspect_handler(desktopd_server *server,
+                               DBusMessage *message,
+                               const char *path)
+{
+    fprintf(stderr, "introspect_handler - path: %s\n", path);
+    if (strcmp(path, "/") == 0) {
+        desktopd_server_send_introspection(server, message,
+            SERVER_INTROSPECTION);
+    } else if (strcmp(path, "/io") == 0) {
+        desktopd_server_send_introspection(server, message,
+            IO_INTROSPECTION);
+    } else if (strcmp(path, "/io/orbitrc") == 0) {
+        desktopd_server_send_introspection(server, message,
+            ORBITRC_INTROSPECTION);
+    } else if (strcmp(path, "/io/orbitrc/Desktop") == 0) {
+        desktopd_server_send_introspection(server, message,
+            DESKTOP_INTROSPECTION);
+    } else if (strcmp(path, "/io/orbitrc/Desktop/Appearance") == 0) {
+        desktopd_server_send_introspection(server, message,
+            DESKTOP_APPEARANCE_INTROSPECTION);
+    } else if (strcmp(path, "/io/orbitrc/Desktop/Desktop") == 0) {
+        desktopd_server_send_introspection(server, message,
+            DESKTOP_DESKTOP_INTROSPECTION);
+    } else if (strcmp(path, "/io/orbitrc/Desktop/Keyboard") == 0) {
+        desktopd_server_send_introspection(server, message,
+            DESKTOP_KEYBOARD_INTROSPECTION);
+    } else {
+        desktopd_server_send_introspection(server, message,
+            SERVER_INTROSPECTION);
+    }
+}
+
+static void property_handler(desktopd_server *server,
+                             DBusMessage *message,
+                             const char *interface,
+                             const char *name)
+{
+    if (strcmp(interface, DESKTOP_INTERFACE) == 0) {
+        if (strcmp(name, "numberOfDesktops") == 0) {
+            DBusMessage *ret;
+            ret = dbus_message_new_method_return(message);
+
+            int val = desktop_property_number_of_desktops();
+            dbus_message_append_args(ret,
+                DBUS_TYPE_INT32, &val,
+                DBUS_TYPE_INVALID);
+            dbus_connection_send(server->connection, ret, NULL);
+            dbus_connection_flush(server->connection);
+
+            dbus_message_unref(ret);
+        }
+    }
 }
 
 int main(int argc, char *argv[])
@@ -54,6 +112,12 @@ int main(int argc, char *argv[])
             return 0;
         }
     }
+
+    desktopd_server server;
+    desktopd_server_connect(&server, SERVER_BUS_NAME);
+    server.introspect = introspect_handler;
+    server.property = property_handler;
+    desktopd_server_run(&server);
 
     DBusConnection *conn;
     DBusError dbus_error;
@@ -86,83 +150,6 @@ int main(int argc, char *argv[])
         }
 
         if (dbus_message_is_method_call(message,
-                DBUS_INTERFACE_INTROSPECTABLE, "Introspect")) {
-            const char *path = dbus_message_get_path(message);
-            fprintf(stderr, "Path: %s\n", path);
-
-            //================
-            // Introspect
-            //================
-            DBusMessage *ret;
-
-            ret = dbus_message_new_method_return(message);
-
-            if (strcmp(path, "/") == 0) {
-                dbus_message_append_args(ret,
-                    DBUS_TYPE_STRING, &SERVER_INTROSPECTION,
-                    DBUS_TYPE_INVALID);
-                dbus_connection_send(conn, ret, NULL);
-                dbus_connection_flush(conn);
-
-                dbus_message_unref(ret);
-            } else if (strcmp(path, "/io") == 0) {
-                dbus_message_append_args(ret,
-                    DBUS_TYPE_STRING, &IO_INTROSPECTION,
-                    DBUS_TYPE_INVALID);
-                dbus_connection_send(conn, ret, NULL);
-                dbus_connection_flush(conn);
-
-                dbus_message_unref(ret);
-            } else if (strcmp(path, "/io/orbitrc") == 0) {
-                dbus_message_append_args(ret,
-                    DBUS_TYPE_STRING, &ORBITRC_INTROSPECTION,
-                    DBUS_TYPE_INVALID);
-                dbus_connection_send(conn, ret, NULL);
-                dbus_connection_flush(conn);
-
-                dbus_message_unref(ret);
-            } else if (strcmp(path, "/io/orbitrc/Desktop") == 0) {
-                dbus_message_append_args(ret,
-                    DBUS_TYPE_STRING, &DESKTOP_INTROSPECTION,
-                    DBUS_TYPE_INVALID);
-                dbus_connection_send(conn, ret, NULL);
-                dbus_connection_flush(conn);
-
-                dbus_message_unref(ret);
-            } else if (strcmp(path, "/io/orbitrc/Desktop/Appearance") == 0) {
-                dbus_message_append_args(ret,
-                    DBUS_TYPE_STRING, &DESKTOP_APPEARANCE_INTROSPECTION,
-                    DBUS_TYPE_INVALID);
-                dbus_connection_send(conn, ret, NULL);
-                dbus_connection_flush(conn);
-
-                dbus_message_unref(ret);
-            } else if (strcmp(path, "/io/orbitrc/Desktop/Desktop") == 0) {
-                dbus_message_append_args(ret,
-                    DBUS_TYPE_STRING, &DESKTOP_DESKTOP_INTROSPECTION,
-                    DBUS_TYPE_INVALID);
-                dbus_connection_send(conn, ret, NULL);
-                dbus_connection_flush(conn);
-
-                dbus_message_unref(ret);
-            } else if (strcmp(path, "/io/orbitrc/Desktop/Keyboard") == 0) {
-                dbus_message_append_args(ret,
-                    DBUS_TYPE_STRING, &DESKTOP_KEYBOARD_INTROSPECTION,
-                    DBUS_TYPE_INVALID);
-                dbus_connection_send(conn, ret, NULL);
-                dbus_connection_flush(conn);
-
-                dbus_message_unref(ret);
-            } else {
-                dbus_message_append_args(ret,
-                    DBUS_TYPE_STRING, &SERVER_INTROSPECTION,
-                    DBUS_TYPE_INVALID);
-                dbus_connection_send(conn, ret, NULL);
-                dbus_connection_flush(conn);
-
-                dbus_message_unref(ret);
-            }
-        } else if (dbus_message_is_method_call(message,
                 DBUS_INTERFACE_PROPERTIES, "Get")) {
             fprintf(stderr, "Hit!\n");
             DBusMessage *ret;

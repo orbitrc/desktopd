@@ -7,16 +7,16 @@
 #include <unistd.h>
 
 #define DESKTOPD_DEFAULT_SCRIPTS_ENABLED_DIR \
-    "/usr/share/desktopd/scripts-enabled"
+    "~/.local/share/desktopd/scripts-enabled"
 
+/// \brief Get desktopd script-enabled directory path.
 void _desktopd_scripts_enabled_dir(char *buf, uint64_t buf_len)
 {
     const char *dir = getenv("DESKTOPD_SCRIPTS_ENABLED_DIR");
     if (dir == NULL) {
-        int len = strlen(DESKTOPD_DEFAULT_SCRIPTS_ENABLED_DIR);
-        int max_len = (len >= buf_len) ? buf_len - 1 : len;
-        strncpy(buf, DESKTOPD_DEFAULT_SCRIPTS_ENABLED_DIR, max_len);
-        buf[max_len] = '\0';
+        char *home = getenv("HOME");
+        snprintf(buf, buf_len, "%s%s",
+            home, DESKTOPD_DEFAULT_SCRIPTS_ENABLED_DIR + 1);
         return;
     }
     int len = strlen(dir);
@@ -68,7 +68,7 @@ bool desktop_method_insert_desktop(int32_t value)
 
     // Make path.
     _desktopd_scripts_enabled_dir(dir, sizeof(dir));
-    sprintf(path, "%s/%s", dir, "insertDesktop");
+    sprintf(path, "%s/%s %d", dir, "insertDesktop", value);
 
     // Check script enabled.
     if (access(path, X_OK) != 0) {
