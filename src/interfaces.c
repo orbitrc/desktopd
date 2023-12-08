@@ -39,7 +39,7 @@ int32_t desktop_property_number_of_desktops()
 
     // Make path.
     _desktopd_scripts_enabled_dir(dir, sizeof(dir));
-    sprintf(path, "%s/%s", dir, "numberOfDesktops");
+    sprintf(path, "%s/%s", dir, "NumberOfDesktops");
 
     // Check sciprt enabled.
     if (access(path, X_OK) != 0) {
@@ -61,6 +61,39 @@ int32_t desktop_property_number_of_desktops()
     return -1;
 }
 
+int32_t desktop_property_current_desktop()
+{
+    char path[512];
+    char dir[128];
+    char ret[32];
+    char *ptr;
+
+    // Make path.
+    _desktopd_scripts_enabled_dir(dir, sizeof(dir));
+    sprintf(path, "%s/%s", dir, "CurrentDesktop");
+
+    // Check script enabled.
+    if (access(path, X_OK) != 0) {
+        return -1;
+    }
+
+    FILE *f = popen(path, "r");
+    if (f == NULL) {
+        return -1;
+    }
+
+    while (fgets(ret, sizeof(ret), f) != NULL) {
+        long n = strtol(ret, &ptr, 10);
+        pclose(f);
+
+        return n;
+    }
+
+    pclose(f);
+
+    return -1;
+}
+
 bool desktop_method_insert_desktop(int32_t value)
 {
     char path[512];
@@ -68,7 +101,7 @@ bool desktop_method_insert_desktop(int32_t value)
 
     // Make path.
     _desktopd_scripts_enabled_dir(dir, sizeof(dir));
-    sprintf(path, "%s/%s %d", dir, "insertDesktop", value);
+    sprintf(path, "%s/%s %d", dir, "InsertDesktop", value);
 
     // Check script enabled.
     if (access(path, X_OK) != 0) {

@@ -1,6 +1,9 @@
 #!/bin/sh
 
-mkdir -p ~/.local/share/desktopd/scripts-enabled
-ln -sf /usr/share/desktopd/scripts/kde-insertDesktop ~/.local/share/desktopd/scripts-enabled/insertDesktop
-ln -sf /usr/share/desktopd/scripts/kde-numberOfDesktops ~/.local/share/desktopd/scripts-enabled/numberOfDesktops
+SCRIPTS_ENABLED_DIR=~/.local/share/desktopd/scripts-enabled
+
+mkdir -p $SCRIPTS_ENABLED_DIR
+ln -sf /usr/share/desktopd/scripts/kde-InsertDesktop $SCRIPTS_ENABLED_DIR/InsertDesktop
+ln -sf /usr/share/desktopd/scripts/kde-NumberOfDesktops $SCRIPTS_ENABLED_DIR/NumberOfDesktops
+ln -sf /usr/share/desktopd/scripts/kde-CurrentDesktop $SCRIPTS_ENABLED_DIR/CurrentDesktop
 

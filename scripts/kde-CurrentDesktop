@@ -1,0 +1,12 @@
+#!/bin/sh
+
+KDE_CURRENT=`dbus-send --session --dest=org.kde.KWin \
+    --print-reply=literal /KWin \
+    org.kde.KWin.currentDesktop`
+
+KDE_CURRENT=`echo $KDE_CURRENT | sed -E 's/[ ]*int32[ ]+([0-9]+)/\1/'`
+# echo $KDE_CURRENT
+CURRENT=$(expr "$KDE_CURRENT" - 1)
+echo $CURRENT
+exit 0
+

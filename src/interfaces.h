@@ -11,12 +11,13 @@ void string_free(char *string);
 /// \brief Dekstop.NumberOfDesktops property.
 int32_t desktop_property_number_of_desktops();
 
+/// \brief Desktop.CurrentDesktop property.
+int32_t desktop_property_current_desktop();
+
 /// \brief Desktop.InsertDesktop method.
 bool desktop_method_insert_desktop(int32_t value);
 
 bool desktop_method_remove_desktop(int32_t value);
-
-int32_t desktop_property_current_desktop();
 
 bool desktop_method_set_current_desktop(int32_t value);
 

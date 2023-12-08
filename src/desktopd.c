@@ -87,7 +87,7 @@ static void property_handler(desktopd_server *server,
                              const char *name)
 {
     if (strcmp(interface, DESKTOP_INTERFACE) == 0) {
-        if (strcmp(name, "numberOfDesktops") == 0) {
+        if (strcmp(name, "NumberOfDesktops") == 0) {
             DBusMessage *ret;
             ret = dbus_message_new_method_return(message);
 
@@ -95,6 +95,29 @@ static void property_handler(desktopd_server *server,
             dbus_message_append_args(ret,
                 DBUS_TYPE_INT32, &val,
                 DBUS_TYPE_INVALID);
+            dbus_connection_send(server->connection, ret, NULL);
+            dbus_connection_flush(server->connection);
+
+            dbus_message_unref(ret);
+        } else if (strcmp(name, "CurrentDesktop") == 0) {
+            DBusMessage *ret;
+            DBusMessageIter iter;
+            DBusMessageIter variant;
+            ret = dbus_message_new_method_return(message);
+
+            int val = desktop_property_current_desktop();
+
+            dbus_message_iter_init_append(ret, &iter);
+            dbus_message_iter_open_container(&iter, DBUS_TYPE_VARIANT,
+                "i", &variant);
+            dbus_message_iter_append_basic(&variant, DBUS_TYPE_INT32, &val);
+            dbus_message_iter_close_container(&iter, &variant);
+
+            /*
+            dbus_message_append_args(ret,
+                DBUS_TYPE_VARIANT, &variant,
+                DBUS_TYPE_INVALID);
+            */
             dbus_connection_send(server->connection, ret, NULL);
             dbus_connection_flush(server->connection);
 
